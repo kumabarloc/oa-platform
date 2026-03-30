@@ -18,6 +18,7 @@
 | 迁移工具 | Flyway | ✅ |
 | 构建工具 | Maven | ✅ |
 | 安全框架 | Spring Security | ✅ |
+| 流程引擎 | Flowable | ✅ |
 | 项目管理 | Maven | ✅ |
 
 ## 核心功能模块（待规划）
