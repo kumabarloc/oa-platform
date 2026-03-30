@@ -2,6 +2,13 @@
 -- 初始化数据（岗位、角色、菜单、默认管理员）
 
 -- ============================================
+-- 部门数据（模拟单位组织架构）
+-- ============================================
+INSERT INTO sys_dept (dept_name, dept_code, dept_type, parent_id, ancestors, sort_order, status, del_flag) VALUES
+('单位', 'UNIT', 'unit', 0, '0', 1, 0, 0),
+('行政办公室', 'ADMIN', 'section', 1, '0,1', 1, 0, 0);
+
+-- ============================================
 -- 岗位数据
 -- ============================================
 INSERT INTO sys_post (post_code, post_name, post_rank, sort_order, status, del_flag) VALUES
@@ -51,10 +58,6 @@ INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, menu_typ
 -- ============================================
 INSERT INTO sys_user (dept_id, emp_no, user_name, nick_name, user_type, email, phone, sex, password, status, del_flag) VALUES
 (1, 'admin', 'admin', '管理员', 'internal', 'admin@example.com', '13800138000', '1', '$2a$10$7JB720yub/SZvFf0EI5M0.YuXR8YiZEuP1nE8g2E.GJ0Q5j2q3vKq', 0, 0);
-
--- ============================================
--- 角色菜单关联
--- ============================================
 -- 超级管理员拥有所有菜单
 INSERT INTO sys_role_menu (role_id, menu_id)
 SELECT 1, id FROM sys_menu WHERE del_flag = 0;
