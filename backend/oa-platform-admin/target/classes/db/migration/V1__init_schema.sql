@@ -125,6 +125,7 @@ CREATE TABLE sys_menu (
     menu_type   CHAR(1) DEFAULT '' COMMENT '菜单类型（M目录 C菜单 F按钮）',
     visible     TINYINT NOT NULL DEFAULT 0 COMMENT '菜单状态（0显示 1隐藏）',
     status      TINYINT NOT NULL DEFAULT 0 COMMENT '菜单状态（0正常 1停用）',
+    del_flag    TINYINT NOT NULL DEFAULT 0 COMMENT '删除标志（0存在 1删除）',
     perms       VARCHAR(100) DEFAULT NULL COMMENT '权限标识',
     icon        VARCHAR(100) DEFAULT '#' COMMENT '菜单图标',
     create_by   VARCHAR(64) DEFAULT '' COMMENT '创建者',

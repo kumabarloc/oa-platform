@@ -56,6 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (cachedUser != null) {
                     LoginUser loginUser = objectMapper.convertValue(cachedUser, LoginUser.class);
                     setAuthentication(loginUser);
+                    com.oa.common.core.security.SecurityUtils.setLoginUser(loginUser);
                 } else {
                     // Token 有效但 Redis 无数据，可能是重启后的情况
                     // 从 Token 中提取基本信息，标记需要刷新

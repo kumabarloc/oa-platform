@@ -30,7 +30,7 @@
             style="width: 60%"
           />
           <div class="captcha-box" @click="refreshCaptcha">
-            <img v-if="captchaData.url" :src="captchaData.url" alt="验证码" />
+            <img v-if="captchaData.image" :src="captchaData.image" alt="验证码" />
             <span v-else class="captcha-placeholder">点击刷新</span>
           </div>
         </el-form-item>
@@ -61,7 +61,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const formRef = ref()
 const loading = ref(false)
-const captchaData = reactive({ key: '', url: '' })
+const captchaData = reactive({ key: '', image: '' })
 
 const form = reactive({
   username: '',
@@ -78,11 +78,11 @@ const rules = {
 async function refreshCaptcha() {
   try {
     const res = await getCaptcha()
-    captchaData.key = res.data?.key || ''
-    captchaData.url = res.data?.image || ''
+    captchaData.key = res.key || ''
+    captchaData.image = res.image || ''
     form.captcha = ''
   } catch {
-    // 忽略
+    ElMessage.error('验证码加载失败，请重试')
   }
 }
 
@@ -90,13 +90,21 @@ async function handleLogin() {
   const valid = await formRef.value.validate().catch(() => false)
   if (!valid) return
 
+  if (!captchaData.key || !form.captcha) {
+    ElMessage.warning('请先获取验证码')
+    return
+  }
+
   loading.value = true
   try {
-    const res = await auth.login({ ...form, captchaKey: captchaData.key })
-    if (res.data?.token) {
-      ElMessage.success('登录成功')
-      router.push('/dashboard')
-    }
+    await auth.login({
+      username: form.username,
+      password: form.password,
+      captcha: form.captcha,
+      captchaKey: captchaData.key,
+    })
+    ElMessage.success('登录成功')
+    router.push('/dashboard')
   } catch {
     refreshCaptcha()
   } finally {

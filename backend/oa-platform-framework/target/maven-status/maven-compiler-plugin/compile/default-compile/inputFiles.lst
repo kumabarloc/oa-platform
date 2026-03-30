@@ -1,4 +1,6 @@
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-framework/src/main/java/com/oa/framework/config/JacksonConfig.java
 /Users/basara/openclaw-projects/oa-platform/backend/oa-platform-framework/src/main/java/com/oa/framework/config/MybatisPlusConfig.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-framework/src/main/java/com/oa/framework/config/RedisConfig.java
 /Users/basara/openclaw-projects/oa-platform/backend/oa-platform-framework/src/main/java/com/oa/framework/config/SecurityConfig.java
 /Users/basara/openclaw-projects/oa-platform/backend/oa-platform-framework/src/main/java/com/oa/framework/security/JwtAuthenticationEntryPoint.java
 /Users/basara/openclaw-projects/oa-platform/backend/oa-platform-framework/src/main/java/com/oa/framework/security/JwtAuthenticationFilter.java

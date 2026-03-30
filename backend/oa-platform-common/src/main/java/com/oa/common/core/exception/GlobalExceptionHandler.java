@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public R<?> handleException(Exception e, HttpServletRequest request) {
-        log.error("Internal server error at [{}]: {}", request.getRequestURI(), e.getMessage(), e);
-        return R.fail(ResultCode.SYSTEM_ERROR.getCode(), "系统内部错误，请稍后重试");
+        log.error("Internal server error at [{}]: {}", request.getRequestURI(), e.getClass().getName() + " - " + e.getMessage(), e);
+        return R.fail(ResultCode.SYSTEM_ERROR.getCode(), e.getClass().getSimpleName() + ": " + e.getMessage());
     }
 }

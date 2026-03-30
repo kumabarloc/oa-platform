@@ -78,6 +78,8 @@ public class AuthService {
         loginUser.setUserType(user.getUserType());
         loginUser.setLoginTime(LocalDateTime.now());
 
+        // 当前线程内也设好（供本次请求后续使用）
+        SecurityUtils.setLoginUser(loginUser);
         // 生成 Token
         String token = jwtUtils.generateToken(loginUser);
 

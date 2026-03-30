@@ -17,10 +17,13 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(credentials) {
       const res = await apiLogin(credentials)
-      this.token = res.data?.token
-      this.user = res.data?.user
-      localStorage.setItem('oa_token', this.token)
-      localStorage.setItem('oa_user', JSON.stringify(this.user))
+      // 后端返回 { token, userInfo }，被拦截器解包后 res 就是这个对象
+      const token = res.token
+      const user = res.userInfo
+      this.token = token
+      this.user = user
+      localStorage.setItem('oa_token', token)
+      localStorage.setItem('oa_user', JSON.stringify(user))
       return res
     },
 
