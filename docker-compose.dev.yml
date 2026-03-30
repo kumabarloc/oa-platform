@@ -1,0 +1,45 @@
+version: '3.8'
+
+# 仅用于本地开发：MySQL + Redis
+# 使用方式：docker compose -f docker-compose.dev.yml up -d
+# 然后手动启动后端：JAVA_HOME=/usr/local/... mvn spring-boot:run
+# 或者前端：cd frontend && npm run dev
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: oa-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: oa_platform
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data-dev:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+      - --skip-name-resolve
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: oa-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data-dev:/data
+
+volumes:
+  mysql-data-dev:
+    driver: local
+  redis-data-dev:
+    driver: local

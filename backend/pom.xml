@@ -42,7 +42,7 @@
         <fastjson.version>2.0.53</fastjson.version>
         <commons-io.version>2.16.1</commons-io.version>
         <commons-fileupload.version>1.5.1</commons-fileupload.version>
-        <lombok.version>1.18.32</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <guava.version>33.4.0-jre</guava.version>
         <jwt.version>0.12.6</jwt.version>
 
