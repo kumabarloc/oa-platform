@@ -29,4 +29,27 @@
 待补充...
 
 ## 部署方案
-待补充...
+
+### Docker Compose 架构
+```
+├── docker-compose.yml
+├── mysql/                 # MySQL 数据持久化
+├── nginx/                 # Nginx 配置
+│   └── nginx.conf
+├── app/                   # 后端 JAR
+└── uploads/               # 文件上传目录
+```
+
+### 容器规划
+| 容器名 | 镜像 | 端口 | 说明 |
+|--------|------|------|------|
+| oa-mysql | mysql:8.0 | 3306 | MySQL 数据库 |
+| oa-redis | redis:7 | 6379 | Redis（可选缓存） |
+| oa-backend | 自定义镜像 | 8080 | Spring Boot 后端 |
+| oa-frontend | nginx:alpine | 80/443 | Vue 前端静态资源 |
+| oa-flowable | 自定义镜像 | 8081 | Flowable 流程引擎 |
+
+### 环境变量
+- DATABASE_HOST, DATABASE_PORT, DATABASE_NAME
+- REDIS_HOST, REDIS_PORT
+- JWT_SECRET, JWT_EXPIRATION

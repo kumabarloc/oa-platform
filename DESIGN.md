@@ -197,19 +197,21 @@
 ## 9. 非功能性需求
 
 ### 9.1 性能
-- [ ] 预期用户并发数
-- [ ] 数据库数据量预估
+- [ ] 预期用户并发数：20-50
+- [ ] 数据库数据量预估：几万条
 
 ### 9.2 安全
-- [ ] HTTPS 要求
-- [ ] SQL 注入防护
-- [ ] XSS 防护
-- [ ] CORS 配置
+- [x] HTTPS 要求（生产环境）
+- [x] SQL 注入防护（MyBatis #{} 语法）
+- [x] XSS 防护（Filter + Spring Security）
+- [x] CORS 配置（后端控制）
 
 ### 9.3 部署
-- [ ] 服务器环境
-- [ ] 是否需要 Docker
-- [ ] 前端部署方式（Nginx）
+- [x] Docker / Docker Compose 部署
+- [ ] 前端：Nginx 容器
+- [ ] 后端：Spring Boot Jar 容器
+- [ ] 数据库：MySQL 容器（或外部服务）
+- [ ] Redis：可选缓存层
 
 ---
 

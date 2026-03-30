@@ -25,3 +25,4 @@
 - [ ] 日志管理
 - [ ] 附件上传
 - [ ] 前端 UI 优化
+- [ ] Docker 部署配置（docker-compose.yml）
