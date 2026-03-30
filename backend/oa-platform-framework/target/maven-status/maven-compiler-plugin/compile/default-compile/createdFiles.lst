@@ -1,7 +1,0 @@
-com/oa/framework/config/SecurityConfig.class
-com/oa/framework/config/RedisConfig.class
-com/oa/framework/security/JwtAuthenticationFilter.class
-com/oa/framework/config/MybatisPlusConfig$1.class
-com/oa/framework/config/MybatisPlusConfig.class
-com/oa/framework/config/JacksonConfig.class
-com/oa/framework/security/JwtAuthenticationEntryPoint.class

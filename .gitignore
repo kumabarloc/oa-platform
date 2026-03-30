@@ -1,0 +1,27 @@
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.logs
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# Node
+node_modules/
+dist/
+.idea/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+spring-boot-*.jar.original
+
+# IDE
+*.iml
+.vscode/
