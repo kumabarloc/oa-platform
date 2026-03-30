@@ -51,7 +51,7 @@ public class UserService {
         for (SysUser user : list) {
             voList.add(toUserListVo(user));
         }
-        return PageResult.of(pageInfo.getTotal(), voList, pageInfo.getPageNum(), pageInfo.getPageSize());
+        return PageResult.of((long)pageInfo.getTotal(), voList, (long)pageInfo.getPageNum(), (long)pageInfo.getPageSize());
     }
 
     /**

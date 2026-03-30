@@ -49,7 +49,7 @@ public class RoleService {
         for (SysRole role : list) {
             voList.add(toRoleListVo(role));
         }
-        return PageResult.of(pageInfo.getTotal(), voList, pageInfo.getPageNum(), pageInfo.getPageSize());
+        return PageResult.of((long)pageInfo.getTotal(), voList, (long)pageInfo.getPageNum(), (long)pageInfo.getPageSize());
     }
 
     /**
@@ -62,7 +62,7 @@ public class RoleService {
         }
         RoleDetailVo vo = toRoleDetailVo(role);
         // 获取角色菜单
-        vo.setMenuIds(roleMapper.selectMenuIdsByRoleId(id));
+        vo.setMenuIds(roleMapper.selectMenuIdsByRoleId(id).toArray(new Long[0]));
         return vo;
     }
 

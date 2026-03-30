@@ -1,0 +1,11 @@
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/entity/SysDept.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/entity/SysMenu.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/entity/SysPost.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/entity/SysRole.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/entity/SysUser.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/entity/SysUserRole.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/mapper/SysDeptMapper.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/mapper/SysMenuMapper.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/mapper/SysRoleMapper.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/mapper/SysUserMapper.java
+/Users/basara/openclaw-projects/oa-platform/backend/oa-platform-system/src/main/java/com/oa/system/mapper/SysUserRoleMapper.java

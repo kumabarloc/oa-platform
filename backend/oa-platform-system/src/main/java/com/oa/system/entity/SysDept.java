@@ -1,6 +1,7 @@
 package com.oa.system.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.oa.common.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

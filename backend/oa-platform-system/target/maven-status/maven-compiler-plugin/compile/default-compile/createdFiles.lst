@@ -1,0 +1,11 @@
+com/oa/system/mapper/SysRoleMapper.class
+com/oa/system/mapper/SysUserRoleMapper.class
+com/oa/system/entity/SysRole.class
+com/oa/system/entity/SysPost.class
+com/oa/system/mapper/SysDeptMapper.class
+com/oa/system/entity/SysDept.class
+com/oa/system/entity/SysMenu.class
+com/oa/system/entity/SysUser.class
+com/oa/system/mapper/SysMenuMapper.class
+com/oa/system/mapper/SysUserMapper.class
+com/oa/system/entity/SysUserRole.class

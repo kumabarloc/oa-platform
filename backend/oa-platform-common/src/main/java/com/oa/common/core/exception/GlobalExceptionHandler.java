@@ -1,6 +1,7 @@
 package com.oa.common.core.exception;
 
 import com.oa.common.core.result.R;
+import com.oa.common.core.result.ResultCode;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

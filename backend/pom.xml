@@ -42,7 +42,7 @@
         <fastjson.version>2.0.53</fastjson.version>
         <commons-io.version>2.16.1</commons-io.version>
         <commons-fileupload.version>1.5.1</commons-fileupload.version>
-        <lombok.version>1.18.36</lombok.version>
+        <lombok.version>1.18.32</lombok.version>
         <guava.version>33.4.0-jre</guava.version>
         <jwt.version>0.12.6</jwt.version>
 
@@ -52,6 +52,9 @@
 
         <!-- Encoding -->
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+
+        <!-- Project Version -->
+        <oa.platform.version>1.0.0-SNAPSHOT</oa.platform.version>
     </properties>
 
     <modules>
@@ -183,9 +186,15 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>21</release>
                     <encoding>UTF-8</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,7 +1,7 @@
 package com.oa.system.domain.dto;
 
 import lombok.Data;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 角色更新DTO
