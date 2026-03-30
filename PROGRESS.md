@@ -17,4 +17,6 @@
 **GitHub 仓库：** https://github.com/kumabarloc/oa-platform
 
 ## 下一步
-和技术负责人确认 OA 平台的技术栈选择（前端、后端、数据库）。
+1. 确认数据库设计是否满足需求
+2. 搭建后端项目基础框架
+3. 开始 Flyway 迁移脚本编写
