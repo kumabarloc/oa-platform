@@ -86,6 +86,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getRoleList, createRole, updateRole, deleteRole, getRoleMenus, assignMenus } from '@/api/role'
+import { getMenuTree } from '@/api/menu'
 
 const dataScopeMap = { '1': '全部', '2': '本部门及以下', '3': '本部门', '4': '仅本人', '5': '自定义' }
 
@@ -150,12 +151,15 @@ async function handleDelete(row) {
 
 async function handleAssignMenus(row) {
   currentRoleId.value = row.id
-  menuTree.value = [] // TODO: 从菜单接口加载
-  checkedMenuIds.value = []
   try {
-    const res = await getRoleMenus(row.id)
-    checkedMenuIds.value = res.data || []
-  } catch {}
+    const menuRes = await getMenuTree()
+    menuTree.value = menuRes.data || []
+    
+    const roleMenuRes = await getRoleMenus(row.id)
+    checkedMenuIds.value = roleMenuRes.data || []
+  } catch (e) {
+    console.error('加载菜单失败', e)
+  }
   menuDialogVisible.value = true
 }
 

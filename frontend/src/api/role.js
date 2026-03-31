@@ -40,14 +40,14 @@ export function deleteRole(id) {
 
 export function getRoleMenus(roleId) {
   return request({
-    url: `/system/role/${roleId}/menus`,
+    url: `/system/role/${roleId}/menu`,
     method: 'get',
   })
 }
 
 export function assignMenus(roleId, menuIds) {
   return request({
-    url: `/system/role/${roleId}/menus`,
+    url: `/system/role/${roleId}/menu`,
     method: 'put',
     data: menuIds,
   })
