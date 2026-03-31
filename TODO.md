@@ -19,6 +19,30 @@
 2. **默认密码问题**
    - 数据库中 admin 用户的密码是 `123456`（不是之前试的 admin123）
 
+3. **登录超时问题**（2026-03-31）
+   - 现象：登录成功后提示"登录超时请重新登录"
+   - 原因：后端重启后 Redis 中的登录缓存丢失，JWT Filter 无法从 Redis 获取用户信息
+   - 解决：重启后端服务即可恢复
+
+### 启动命令（重要！）
+```bash
+# 1. 启动 Docker 数据库
+docker start oa-mysql-dev oa-redis-dev
+
+# 2. 启动后端
+cd /Users/basara/openclaw-projects/oa-platform/backend/oa-platform-admin
+java -jar target/oa-platform-admin.jar
+
+# 3. 启动前端
+cd /Users/basara/openclaw-projects/oa-platform/frontend
+npm run dev
+```
+
+### 访问地址
+- 前端：https://localhost:5174（注意是 5174，不是 5173）
+- 后端 API：http://localhost:8080
+- 登录账号：admin / 123456
+
 ## 高优先级
 - [✅] 确定技术栈（Vue3 + Element Plus, Spring Boot, MySQL, Flowable）
 - [✅] 设计数据库表结构（见 DB_DESIGN.md）

@@ -97,15 +97,18 @@ async function handleLogin() {
 
   loading.value = true
   try {
-    await auth.login({
+    const res = await auth.login({
       username: form.username,
       password: form.password,
       captcha: form.captcha,
       captchaKey: captchaData.key,
     })
+    console.log('Login response:', res)
+    console.log('Auth store:', auth.token, auth.user)
     ElMessage.success('登录成功')
-    router.push('/dashboard')
-  } catch {
+    await router.push('/dashboard')
+  } catch (e) {
+    console.error('Login failed:', e)
     refreshCaptcha()
   } finally {
     loading.value = false

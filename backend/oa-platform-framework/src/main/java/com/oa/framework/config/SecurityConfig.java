@@ -48,7 +48,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // 放行路径
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/captcha/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/captcha/**", "/auth/**", "/captcha/**").permitAll()
                 .requestMatchers("/doc.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
@@ -78,7 +78,7 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Type", "Captcha-Id"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 

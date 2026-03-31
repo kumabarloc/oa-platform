@@ -56,12 +56,15 @@ const router = createRouter({
 // 路由守卫：登录验证 + 权限过滤
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
+  console.log('[Router Guard] path:', to.path, '| isLoggedIn:', auth.isLoggedIn, '| requiresAuth:', to.meta.requiresAuth)
 
   if (to.meta.requiresAuth !== false && !auth.isLoggedIn) {
+    console.log('[Router Guard] → redirect to /login (not logged in)')
     return next('/login')
   }
 
   if (to.path === '/login' && auth.isLoggedIn) {
+    console.log('[Router Guard] → redirect to /dashboard (already logged in)')
     return next('/dashboard')
   }
 
