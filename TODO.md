@@ -6,11 +6,18 @@
 排查登录页面无法显示的问题
 
 ## 🔴 待解决问题
-- [ ] 登录页面无法显示（之前有验证码问题，现在页面刷不出来）
+- [x] 登录页面无法显示（之前有验证码问题，现在页面刷不出来）
   - 问题描述：前端服务已启动（https://localhost:5174），后端服务已启动（http://localhost:8080）
   - 验证码 API 测试结果：✅ 正常返回 PNG 图片
-  - 状态：待用户在浏览器测试确认
-  - 相关模块：前端 Vue3 + Element Plus，后端 Spring Boot
+  - 状态：已修复
+
+### 修复记录
+1. **登录后不跳转问题**（2026-03-31）
+   - 原因：前端 Pinia store 解析响应数据结构错误。后端返回 `{ code: 200, data: { token, userInfo } }`，但前端直接读取 `res.token`
+   - 解决：修改 `src/stores/auth.js` 中的 login 方法，改为读取 `res.data?.token`
+   
+2. **默认密码问题**
+   - 数据库中 admin 用户的密码是 `123456`（不是之前试的 admin123）
 
 ## 高优先级
 - [✅] 确定技术栈（Vue3 + Element Plus, Spring Boot, MySQL, Flowable）
