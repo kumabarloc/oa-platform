@@ -27,7 +27,8 @@ service.interceptors.response.use(
       ElMessage.error(res.message || '请求失败')
       return Promise.reject(new Error(res.message))
     }
-    return res
+    // 返回 data 部分，这样页面可以直接使用 res.data
+    return res.data
   },
   (error) => {
     if (error.response) {

@@ -58,6 +58,11 @@ public class AuthController {
     public R<?> login(@RequestBody @Valid LoginRequest request,
                       @RequestHeader(value = "Captcha-Id", required = false) String captchaId,
                       @RequestHeader(value = "Captcha-Code", required = false) String captchaCode) {
+        // 如果 header 没有验证码信息，尝试从 body 获取（captchaKey 对应 Captcha-Id）
+        if ((captchaId == null || captchaCode == null) && request.getCaptchaKey() != null) {
+            captchaId = request.getCaptchaKey();
+            captchaCode = request.getCaptcha();
+        }
         return R.ok(authService.login(request.getUsername(), request.getPassword(), captchaId, captchaCode));
     }
 
@@ -93,5 +98,7 @@ public class AuthController {
     public static class LoginRequest {
         private String username;
         private String password;
+        private String captcha;      // 验证码
+        private String captchaKey;  // 验证码ID
     }
 }
