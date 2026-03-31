@@ -72,7 +72,7 @@ const form = reactive({
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+  // captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
 }
 
 async function refreshCaptcha() {
@@ -90,18 +90,20 @@ async function handleLogin() {
   const valid = await formRef.value.validate().catch(() => false)
   if (!valid) return
 
-  if (!captchaData.key || !form.captcha) {
-    ElMessage.warning('请先获取验证码')
-    return
-  }
+  // TODO: 验证码编码问题暂时跳过验证
+  // if (!captchaData.key || !form.captcha) {
+  //   ElMessage.warning('请先获取验证码')
+  //   return
+  // }
 
   loading.value = true
   try {
     const res = await auth.login({
       username: form.username,
       password: form.password,
-      captcha: form.captcha,
-      captchaKey: captchaData.key,
+      // 验证码暂时不传，等后端修复编码问题后再启用
+      // captcha: form.captcha,
+      // captchaKey: captchaData.key,
     })
     console.log('Login response:', res)
     console.log('Auth store:', auth.token, auth.user)
