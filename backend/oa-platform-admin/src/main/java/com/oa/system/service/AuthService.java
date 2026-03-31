@@ -6,15 +6,19 @@ import com.oa.common.core.result.ResultCode;
 import com.oa.common.core.security.JwtUtils;
 import com.oa.common.core.security.LoginUser;
 import com.oa.common.core.security.SecurityUtils;
+import com.oa.system.entity.SysRole;
 import com.oa.system.entity.SysUser;
 import com.oa.system.mapper.SysUserMapper;
+import com.oa.system.mapper.SysUserRoleMapper;
 import lombok.Data;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 认证服务
@@ -23,17 +27,20 @@ import java.util.concurrent.TimeUnit;
 public class AuthService {
 
     private final SysUserMapper userMapper;
+    private final SysUserRoleMapper userRoleMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
     public AuthService(SysUserMapper userMapper,
+                      SysUserRoleMapper userRoleMapper,
                       PasswordEncoder passwordEncoder,
                       JwtUtils jwtUtils,
                       RedisTemplate<String, Object> redisTemplate,
                       ObjectMapper objectMapper) {
         this.userMapper = userMapper;
+        this.userRoleMapper = userRoleMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.redisTemplate = redisTemplate;
@@ -77,6 +84,13 @@ public class AuthService {
         loginUser.setDeptId(user.getDeptId());
         loginUser.setUserType(user.getUserType());
         loginUser.setLoginTime(LocalDateTime.now());
+
+        // 查询用户的角色信息
+        List<SysRole> roles = userRoleMapper.selectRolesByUserId(user.getId());
+        if (roles != null && !roles.isEmpty()) {
+            loginUser.setRoleIds(roles.stream().map(SysRole::getId).toArray(Long[]::new));
+            loginUser.setRoleKeys(roles.stream().map(SysRole::getRoleKey).toArray(String[]::new));
+        }
 
         // 当前线程内也设好（供本次请求后续使用）
         SecurityUtils.setLoginUser(loginUser);
