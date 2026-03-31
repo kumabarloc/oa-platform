@@ -2,6 +2,7 @@ package com.oa.system.controller;
 
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.LineCaptcha;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.oa.common.core.result.R;
 import com.oa.system.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,9 +11,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -25,10 +30,12 @@ public class AuthController {
 
     private final AuthService authService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
-    public AuthController(AuthService authService, RedisTemplate<String, Object> redisTemplate) {
+    public AuthController(AuthService authService, RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
         this.authService = authService;
         this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -55,15 +62,26 @@ public class AuthController {
      */
     @Operation(summary = "用户登录")
     @PostMapping("/login")
-    public R<?> login(@RequestBody @Valid LoginRequest request,
+    public R<?> login(@RequestBody String jsonBody,
                       @RequestHeader(value = "Captcha-Id", required = false) String captchaId,
                       @RequestHeader(value = "Captcha-Code", required = false) String captchaCode) {
-        // 如果 header 没有验证码信息，尝试从 body 获取（captchaKey 对应 Captcha-Id）
-        if ((captchaId == null || captchaCode == null) && request.getCaptchaKey() != null) {
-            captchaId = request.getCaptchaKey();
-            captchaCode = request.getCaptcha();
+        // 从 body 中解析 username 和 password
+        String username = null, password = null;
+        try {
+            Map<String, Object> map = objectMapper.readValue(jsonBody, Map.class);
+            username = (String) map.get("username");
+            password = (String) map.get("password");
+            
+            // 如果 header 没有验证码信息，尝试从 body 获取
+            if ((captchaId == null || captchaCode == null) && map.get("captchaKey") != null) {
+                captchaId = (String) map.get("captchaKey");
+                captchaCode = (String) map.get("captcha");
+            }
+        } catch (Exception e) {
+            // 解析失败，使用默认处理
         }
-        return R.ok(authService.login(request.getUsername(), request.getPassword(), captchaId, captchaCode));
+        
+        return R.ok(authService.login(username, password, captchaId, captchaCode));
     }
 
     /**
@@ -92,13 +110,5 @@ public class AuthController {
     @PostMapping("/refresh")
     public R<?> refreshToken() {
         return R.ok(authService.refreshToken());
-    }
-
-    @Data
-    public static class LoginRequest {
-        private String username;
-        private String password;
-        private String captcha;      // 验证码
-        private String captchaKey;  // 验证码ID
     }
 }
