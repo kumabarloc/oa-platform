@@ -79,7 +79,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void setAuthentication(LoginUser loginUser) {
-        List<SimpleGrantedAuthority> authorities = Arrays.stream(loginUser.getRoleKeys())
+        String[] roleKeys = loginUser.getRoleKeys() == null ? new String[0] : loginUser.getRoleKeys();
+        List<SimpleGrantedAuthority> authorities = Arrays.stream(roleKeys)
                 .map(roleKey -> new SimpleGrantedAuthority("ROLE_" + roleKey))
                 .collect(Collectors.toList());
 

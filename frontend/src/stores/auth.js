@@ -17,9 +17,9 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(credentials) {
       const res = await apiLogin(credentials)
-      // 后端返回 { code: 200, data: { token, userInfo } }，拦截器返回整个对象
-      const token = res.data?.token
-      const user = res.data?.userInfo
+      // 后端返回 R.ok(LoginVo)，request 拦截器已解包为 LoginVo：{ token, userInfo }
+      const token = res?.token
+      const user = res?.userInfo
       if (!token) {
         throw new Error('登录失败：未获取到 token')
       }
@@ -32,11 +32,10 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchUserInfo() {
       const res = await getUserInfo()
-      // 拦截器返回 res.data
-      this.user = res.data?.user
-      this.menus = res.data?.menus || []
+      // 后端返回 R.ok(LoginUser)，request 拦截器已解包为 LoginUser
+      this.user = res || null
       localStorage.setItem('oa_user', JSON.stringify(this.user))
-      localStorage.setItem('oa_menus', JSON.stringify(this.menus))
+      // menus 目前前端用 mock，后端返回菜单后再在此落库
       return res
     },
 

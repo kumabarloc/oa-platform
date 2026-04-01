@@ -23,12 +23,13 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const res = response.data
-    if (res.code && res.code !== 200) {
+    // 后端标准响应：{ code, message, data }
+    // 兼容少量非标准响应（无 code 字段）直接透传整个 response.data
+    if (typeof res?.code === 'number' && res.code !== 200) {
       ElMessage.error(res.message || '请求失败')
       return Promise.reject(new Error(res.message))
     }
-    // 返回 data 部分，这样页面可以直接使用 res.data
-    return res.data
+    return typeof res?.code === 'number' ? res.data : res
   },
   (error) => {
     if (error.response) {
