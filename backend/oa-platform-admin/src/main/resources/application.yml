@@ -74,7 +74,10 @@ flowable:
   async-history-enabled: true
   db-history-used: true
   process-definition-cache-limit: -1
-  # 禁止自动部署 Flowable 表，我们用 Flyway 手动管理
+  # 建议：开发环境先让 Flowable 自动建表/更新，避免因缺表导致引擎无法启动
+  # 等后续把 Flowable 表纳入 Flyway 再改为 false/none
+  database-schema-update: true
+  # 禁止启动时反复扫描/校验流程定义（按需调整）
   check-process-definitions: false
 
 # JWT 配置

@@ -23,6 +23,12 @@
             <version>${oa.platform.version}</version>
         </dependency>
 
+        <!-- Spring Web（提供 Controller/API） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- Flowable -->
         <dependency>
             <groupId>org.flowable</groupId>

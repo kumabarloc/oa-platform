@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://oa-platform/workflow">
+
+  <process id="leaveRequest" name="请假申请(示例)" isExecutable="true">
+    <startEvent id="start" name="开始"/>
+
+    <userTask id="applyTask" name="发起申请" flowable:assignee="${applicant}">
+      <documentation>申请人提交请假申请（示例流程）。</documentation>
+    </userTask>
+
+    <userTask id="managerApproveTask" name="主管审批" flowable:candidateGroups="admin">
+      <documentation>主管审批（示例：候选组 admin）。</documentation>
+    </userTask>
+
+    <endEvent id="end" name="结束"/>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="applyTask"/>
+    <sequenceFlow id="flow2" sourceRef="applyTask" targetRef="managerApproveTask"/>
+    <sequenceFlow id="flow3" sourceRef="managerApproveTask" targetRef="end"/>
+  </process>
+
+</definitions>
