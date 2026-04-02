@@ -3,53 +3,89 @@
     <el-card v-loading="loading">
       <template #header>
         <div class="flex justify-between items-center">
-          <span>公文详情</span>
-          <el-button @click="handleBack">返回</el-button>
+          <span class="page-title">📄 公文详情</span>
+          <el-button @click="handleBack">
+            <el-icon><ArrowLeft /></el-icon> 返回
+          </el-button>
         </div>
       </template>
 
       <div v-if="doc">
-        <el-descriptions :column="2" border class="mb-6">
-          <el-descriptions-item label="标题">{{ doc.title }}</el-descriptions-item>
-          <el-descriptions-item label="类型"><el-tag>{{ docTypeLabel(doc.docType) }}</el-tag></el-descriptions-item>
-          <el-descriptions-item label="优先级"><el-tag :type="priorityTag(doc.priority)">{{ priorityLabel(doc.priority) }}</el-tag></el-descriptions-item>
-          <el-descriptions-item label="状态"><el-tag :type="statusTag(doc.status)">{{ statusLabel(doc.status) }}</el-tag></el-descriptions-item>
-          <el-descriptions-item label="创建时间">{{ doc.createTime }}</el-descriptions-item>
-          <el-descriptions-item label="发布时间">{{ doc.publishTime || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="当前步骤" :span="2">{{ doc.currentStep || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="备注" :span="2">{{ doc.remark || '-' }}</el-descriptions-item>
-        </el-descriptions>
-
-        <div class="mb-6">
-          <div class="font-semibold mb-2">正文内容</div>
-          <el-card shadow="never"><div v-html="doc.content || '暂无正文内容'"/></el-card>
+        <!-- 状态横幅 -->
+        <div class="status-banner" :class="`status-${doc.status}`">
+          <el-tag :type="statusTag(doc.status)" size="large">{{ statusLabel(doc.status) }}</el-tag>
+          <span class="banner-title">{{ doc.title }}</span>
+          <span class="banner-meta" v-if="doc.currentStep">当前环节：{{ doc.currentStep }}</span>
         </div>
 
-        <div v-if="history.length > 0">
-          <div class="font-semibold mb-4">审批历史</div>
-          <el-table :data="history" stripe size="small">
-            <el-table-column prop="taskName" label="审批节点" width="160"/>
-            <el-table-column prop="assignee" label="审批人" width="120"/>
-            <el-table-column prop="startTime" label="开始时间" width="170"/>
-            <el-table-column prop="endTime" label="结束时间" width="170"/>
-            <el-table-column prop="deleteReason" label="审批结果">
-              <template #default="{row}">{{ row.deleteReason || '通过' }}</template>
-            </el-table-column>
-          </el-table>
-        </div>
+        <!-- 公文信息卡片 -->
+        <el-card class="info-card" shadow="never">
+          <template #header><span class="section-title">基本信息</span></template>
+          <el-descriptions :column="3" border size="small">
+            <el-descriptions-item label="类型"><el-tag size="small">{{ docTypeLabel(doc.docType) }}</el-tag></el-descriptions-item>
+            <el-descriptions-item label="优先级">
+              <el-tag :type="priorityTag(doc.priority)" size="small">{{ priorityLabel(doc.priority) }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="创建时间">{{ doc.createTime }}</el-descriptions-item>
+            <el-descriptions-item label="创建部门">{{ doc.deptName || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="拟稿人">{{ doc.draftUserName || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="发布时间">{{ doc.publishTime || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="备注" :span="3">{{ doc.remark || '无' }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
 
-        <div class="mt-4 flex gap-2" v-if="doc.status === 'pending'">
-          <el-button type="success" @click="handleApprove">通过</el-button>
-          <el-button type="danger" @click="showRejectDialog=true">驳回</el-button>
+        <!-- 正文内容 -->
+        <el-card class="content-card" shadow="never" v-if="doc.content">
+          <template #header><span class="section-title">正文内容</span></template>
+          <div class="doc-content" v-html="doc.content" />
+        </el-card>
+
+        <!-- 审批时间线 -->
+        <el-card class="history-card" shadow="never" v-if="history.length > 0">
+          <template #header>
+            <div class="section-title">🕐 审批流程</div>
+          </template>
+          <el-steps direction="vertical" :space="60" :active="history.length - 1">
+            <el-step
+              v-for="(item, idx) in history"
+              :key="idx"
+              :title="item.taskName || '审批节点'"
+              :description="`${item.assignee || '系统'} · ${item.startTime || ''}`"
+            >
+              <template #icon v-if="idx === history.length - 1 && doc.status === 'pending'">
+                <el-icon color="#409eff"><Loading /></el-icon>
+              </template>
+              <template #title v-if="item.deleteReason === '驳回'">
+                <span style="color: #f56c6c">驳回 · {{ item.endTime }}</span>
+              </template>
+              <template #title v-else-if="item.endTime">
+                <span style="color: #67c23a">通过 · {{ item.endTime }}</span>
+              </template>
+              <template #title v-else>
+                <span style="color: #409eff">处理中</span>
+              </template>
+            </el-step>
+          </el-steps>
+        </el-card>
+
+        <!-- 操作按钮 -->
+        <div class="action-bar" v-if="doc.status === 'pending'">
+          <el-button type="success" size="large" @click="handleApprove">
+            <el-icon><Check /></el-icon> 通过
+          </el-button>
+          <el-button type="danger" size="large" @click="showRejectDialog=true">
+            <el-icon><Close /></el-icon> 驳回
+          </el-button>
         </div>
       </div>
     </el-card>
 
-    <el-dialog v-model="showRejectDialog" title="驳回原因" width="400px">
-      <el-input v-model="rejectReason" type="textarea" :rows="4" placeholder="请输入驳回原因"/>
+    <!-- 驳回对话框 -->
+    <el-dialog v-model="showRejectDialog" title="填写驳回原因" width="450px" destroy-on-close>
+      <el-input v-model="rejectReason" type="textarea" :rows="4" placeholder="请详细说明驳回原因，以便拟稿人修订" maxlength="500" show-word-limit />
       <template #footer>
         <el-button @click="showRejectDialog=false">取消</el-button>
-        <el-button type="danger" @click="handleReject">确认驳回</el-button>
+        <el-button type="danger" @click="handleReject" :loading="rejecting">确认驳回</el-button>
       </template>
     </el-dialog>
   </div>
@@ -59,6 +95,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { ArrowLeft, Check, Close, Loading } from '@element-plus/icons-vue'
 import { getDocumentDetail, getApprovalHistory, approveDocument, rejectDocument } from '@/api/workflow/document'
 
 const router = useRouter()
@@ -68,6 +105,7 @@ const doc = ref(null)
 const history = ref([])
 const showRejectDialog = ref(false)
 const rejectReason = ref('')
+const rejecting = ref(false)
 
 onMounted(async () => {
   loading.value = true
@@ -80,16 +118,18 @@ onMounted(async () => {
 
 async function handleApprove() {
   try {
-    await ElMessageBox.confirm('确认审批通过?', '审批')
+    await ElMessageBox.confirm('确认审批通过该公文？', '审批确认')
     const user = JSON.parse(localStorage.getItem('oa_user') || '{}')
     await approveDocument(route.params.id, user.id || 1)
-    ElMessage.success('审批成功')
+    ElMessage.success('审批通过！')
     doc.value = await getDocumentDetail(route.params.id)
     history.value = await getApprovalHistory(route.params.id)
   } catch(e) { if (e !== 'cancel') ElMessage.error('审批失败') }
 }
 
 async function handleReject() {
+  if (!rejectReason.value.trim()) { ElMessage.warning('请填写驳回原因'); return }
+  rejecting.value = true
   try {
     const user = JSON.parse(localStorage.getItem('oa_user') || '{}')
     await rejectDocument(route.params.id, user.id || 1, rejectReason.value)
@@ -98,12 +138,59 @@ async function handleReject() {
     doc.value = await getDocumentDetail(route.params.id)
     history.value = await getApprovalHistory(route.params.id)
   } catch { ElMessage.error('驳回失败') }
+  finally { rejecting.value = false }
 }
 
 function handleBack() { router.back() }
+
 function docTypeLabel(v) { return {notice:'通知',info:'简报',report:'报告'}[v]||v }
 function priorityLabel(v) { return {low:'低',normal:'普通',high:'紧急'}[v]||v }
 function priorityTag(v) { return {low:'info',normal:'',high:'danger'}[v]||'' }
 function statusLabel(v) { return {draft:'草稿',pending:'待审',approved:'已发布',rejected:'已驳回'}[v]||v }
 function statusTag(v) { return {draft:'info',pending:'warning',approved:'success',rejected:'danger'}[v]||'' }
 </script>
+
+<style scoped>
+.document-detail { padding: 4px 0; }
+.page-title { font-size: 16px; font-weight: 600; }
+
+/* 状态横幅 */
+.status-banner {
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  color: #fff;
+}
+.status-draft { background: linear-gradient(135deg, #909399, #b3b8bd); }
+.status-pending { background: linear-gradient(135deg, #e6a23c, #f5c87a); }
+.status-approved { background: linear-gradient(135deg, #67c23a, #95d475); }
+.status-rejected { background: linear-gradient(135deg, #f56c6c, #f89a9a); }
+.banner-title { font-size: 16px; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.banner-meta { font-size: 13px; opacity: 0.9; white-space: nowrap; }
+
+/* 信息卡片 */
+.info-card, .content-card, .history-card { margin-bottom: 16px; border-radius: 10px; }
+.section-title { font-size: 14px; font-weight: 600; color: #303133; }
+
+/* 正文样式 */
+.doc-content {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #333;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* 操作栏 */
+.action-bar {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 8px;
+}
+</style>
