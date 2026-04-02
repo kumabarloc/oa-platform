@@ -94,3 +94,27 @@ oa-platform/
 - [x] 单公司架构，不考虑多租户
 - [x] 用户规模：设计容量 400 人，实际用户 20 人左右
 - [x] 使用 Docker 部署时，确保 `JAVA_HOME` 指向正确版本
+
+## 更新记录 (2026-04-02)
+
+### 用户管理模块 ✅
+- GET /api/system/user/info - 获取当前用户信息
+- PUT /api/system/user/password - 修改当前用户密码
+- sys_user.phone / avatar 字段已存在
+- 前端用户列表增加头像列、完整表单弹窗
+
+### 通知管理模块 ✅
+- sys_notification 表（含 type、target_type、read_status）
+- sys_notification_read 表（阅读记录）
+- NotificationController: CRUD + 已读/未读/全部已读
+- 前端通知列表页、发布通知弹窗
+
+### 收文管理模块 ✅
+- sys_incoming_document 表（自动生成收文编号 SW-YYYYMMDD-序号）
+- IncomingDocumentController: 登记/编辑/分发/归档
+- 前端收文列表、详情页
+
+### 日志管理模块 ✅
+- sys_login_log 表、sys_operation_log 表
+- LoginLogController、OperationLogController
+- 前端登录日志页、操作日志页
