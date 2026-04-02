@@ -29,26 +29,34 @@
 
     <!-- 表格 -->
     <el-table :data="tableData" v-loading="loading" stripe>
-      <el-table-column prop="id" label="ID" width="80" />
+      <el-table-column prop="id" label="ID" width="70" />
+      <el-table-column prop="avatar" label="头像" width="70">
+        <template #default="{ row }">
+          <el-avatar :size="32">
+            <img v-if="row.avatar" :src="row.avatar" @error="e => e.target.style.display='none'" />
+            <span v-else>{{ row.nickName?.[0] || row.userName?.[0] || 'U' }}</span>
+          </el-avatar>
+        </template>
+      </el-table-column>
       <el-table-column prop="userName" label="用户名" width="120" />
       <el-table-column prop="nickName" label="昵称" width="120" />
       <el-table-column prop="empNo" label="工号" width="100" />
-      <el-table-column prop="deptName" label="部门" width="120" />
+      <el-table-column prop="deptName" label="部门" width="130" />
       <el-table-column prop="postName" label="岗位" width="100" />
       <el-table-column prop="phone" label="手机号" width="130" />
-      <el-table-column prop="email" label="邮箱" min-width="180" />
+      <el-table-column prop="email" label="邮箱" min-width="160" />
       <el-table-column label="状态" width="80">
         <template #default="{ row }">
-          <el-tag :type="row.status === 0 ? 'success' : 'danger'">
+          <el-tag :type="row.status === 0 ? 'success' : 'danger'" size="small">
             {{ row.status === 0 ? '正常' : '停用' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
-          <el-button link type="primary" @click="handleEdit(row)">编辑</el-button>
-          <el-button link type="danger" @click="handleDelete(row)">删除</el-button>
-          <el-button link type="warning" @click="handleResetPwd(row)">重置密码</el-button>
+          <el-button link type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
+          <el-button link type="warning" size="small" @click="handleResetPwd(row)">重置密码</el-button>
+          <el-button link type="danger" size="small" @click="handleDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -121,7 +129,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getUserList, createUser, updateUser, deleteUser, resetPassword } from '@/api/user'
+import { getUserList, createUser, updateUser, deleteUser, resetPassword } from '@/api/system/user'
 import { getDeptTree } from '@/api/dept'
 import { getRoleList } from '@/api/role'
 
@@ -135,16 +143,8 @@ const dialogTitle = ref('新增用户')
 const submitting = ref(false)
 const formRef = ref()
 const form = reactive({
-  id: null,
-  userName: '',
-  nickName: '',
-  empNo: '',
-  deptId: null,
-  postId: null,
-  roleIds: [],
-  phone: '',
-  email: '',
-  status: 0,
+  id: null, userName: '', nickName: '', empNo: '', deptId: null, postId: null,
+  roleIds: [], phone: '', email: '', status: 0,
 })
 const formRules = {
   userName: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -159,13 +159,9 @@ async function loadData() {
   loading.value = true
   try {
     const res = await getUserList(query)
-    tableData.value = res.data?.list || []
-    total.value = res.data?.total || 0
-  } catch {
-    // handled by interceptor
-  } finally {
-    loading.value = false
-  }
+    tableData.value = res.list || []
+    total.value = res.total || 0
+  } catch {} finally { loading.value = false }
 }
 
 function resetQuery() {
@@ -175,51 +171,41 @@ function resetQuery() {
 
 function handleCreate() {
   dialogTitle.value = '新增用户'
+  Object.assign(form, { id: null, userName: '', nickName: '', empNo: '',
+    deptId: null, postId: null, roleIds: [], phone: '', email: '', status: 0 })
   dialogVisible.value = true
 }
 
 function handleEdit(row) {
   dialogTitle.value = '编辑用户'
   Object.assign(form, {
-    id: row.id,
-    userName: row.userName,
-    nickName: row.nickName,
-    empNo: row.empNo,
-    deptId: row.deptId,
-    postId: row.postId,
-    roleIds: row.roleIds || [],
-    phone: row.phone,
-    email: row.email,
-    status: row.status,
+    id: row.id, userName: row.userName, nickName: row.nickName, empNo: row.empNo,
+    deptId: row.deptId, postId: row.postId, roleIds: row.roleIds || [],
+    phone: row.phone || '', email: row.email || '', status: row.status,
   })
   dialogVisible.value = true
 }
 
 function dialogClosed() {
-  formRef.value.resetFields()
+  formRef.value?.resetFields()
   Object.assign(form, { id: null })
 }
 
 async function handleSubmit() {
   const valid = await formRef.value.validate().catch(() => false)
   if (!valid) return
-
   submitting.value = true
   try {
     if (form.id) {
       await updateUser(form.id, form)
       ElMessage.success('更新成功')
     } else {
-      await createUser(form)
+      await createUser({ ...form, password: '123456' })
       ElMessage.success('创建成功')
     }
     dialogVisible.value = false
     loadData()
-  } catch {
-    // handled
-  } finally {
-    submitting.value = false
-  }
+  } catch {} finally { submitting.value = false }
 }
 
 async function handleDelete(row) {
@@ -230,14 +216,13 @@ async function handleDelete(row) {
 }
 
 async function handleResetPwd(row) {
-  await ElMessageBox.confirm(`确认重置用户「${row.userName}」的密码？`, '提示')
+  await ElMessageBox.confirm(`确认重置「${row.userName}」的密码为 123456？`, '提示', { type: 'info' })
   await resetPassword(row.id)
-  ElMessage.success('密码已重置为 123456')
+  ElMessage.success('密码已重置')
 }
 
 onMounted(async () => {
   loadData()
-  // 加载部门树和角色列表
   const [deptRes, roleRes] = await Promise.allSettled([getDeptTree(), getRoleList()])
   if (deptRes.status === 'fulfilled') deptTree.value = deptRes.value.data || []
   if (roleRes.status === 'fulfilled') roleOptions.value = roleRes.value.data || []

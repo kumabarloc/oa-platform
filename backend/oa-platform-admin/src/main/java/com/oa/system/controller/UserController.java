@@ -1,9 +1,8 @@
 package com.oa.system.controller;
 
 import com.oa.common.core.result.R;
-import com.oa.system.domain.vo.LoginUserVo;
+import com.oa.common.core.security.SecurityUtils;
 import com.oa.system.domain.vo.UserDetailVo;
-import com.oa.system.domain.vo.UserListVo;
 import com.oa.system.domain.dto.UserQuery;
 import com.oa.system.domain.dto.UserCreateDto;
 import com.oa.system.domain.dto.UserUpdateDto;
@@ -26,6 +25,12 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @Operation(summary = "获取当前用户信息")
+    @GetMapping("/info")
+    public R<?> getCurrentUserInfo() {
+        return R.ok(userService.getCurrentUserInfo());
     }
 
     @Operation(summary = "获取用户列表")
@@ -60,15 +65,28 @@ public class UserController {
         return R.ok();
     }
 
-    @Operation(summary = "重置密码")
+    @Operation(summary = "重置用户密码")
     @PutMapping("/{id}/password")
     public R<?> resetPassword(@PathVariable Long id, @RequestBody PasswordRequest request) {
         userService.resetPassword(id, request.getPassword());
         return R.ok();
     }
 
+    @Operation(summary = "修改当前用户密码")
+    @PutMapping("/password")
+    public R<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        userService.changePassword(request.getOldPassword(), request.getNewPassword());
+        return R.ok();
+    }
+
     @Data
     public static class PasswordRequest {
         private String password;
+    }
+
+    @Data
+    public static class ChangePasswordRequest {
+        private String oldPassword;
+        private String newPassword;
     }
 }

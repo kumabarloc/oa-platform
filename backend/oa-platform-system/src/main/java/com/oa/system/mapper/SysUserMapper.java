@@ -1,23 +1,17 @@
 package com.oa.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.oa.system.domain.vo.UserListVo;
 import com.oa.system.entity.SysUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import java.util.List;
 
-/**
- * 用户 Mapper
- */
 @Mapper
 public interface SysUserMapper extends BaseMapper<SysUser> {
-
-    /**
-     * 根据用户名查询用户
-     */
     SysUser selectByUserName(@Param("userName") String userName);
-
-    /**
-     * 根据工号查询用户
-     */
     SysUser selectByEmpNo(@Param("empNo") String empNo);
+    List<UserListVo> selectUserList(@Param("userName") String userName,
+                                    @Param("phone") String phone,
+                                    @Param("status") Integer status);
 }

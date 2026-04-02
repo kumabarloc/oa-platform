@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.oa.common.core.exception.BusinessException;
 import com.oa.common.core.page.PageResult;
 import com.oa.common.core.result.ResultCode;
+import com.oa.common.core.security.SecurityUtils;
 import com.oa.system.domain.dto.UserCreateDto;
 import com.oa.system.domain.dto.UserQuery;
 import com.oa.system.domain.dto.UserUpdateDto;
@@ -37,6 +38,21 @@ public class UserService {
         this.userMapper = userMapper;
         this.userRoleMapper = userRoleMapper;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    /**
+     * 获取当前登录用户信息
+     */
+    public UserDetailVo getCurrentUserInfo() {
+        Long userId = SecurityUtils.getUserId();
+        if (userId == null) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "未登录");
+        }
+        SysUser user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.DATA_NOT_FOUND);
+        }
+        return toUserDetailVo(user);
     }
 
     /**
@@ -146,7 +162,7 @@ public class UserService {
     }
 
     /**
-     * 重置密码
+     * 重置用户密码（管理员操作）
      */
     public void resetPassword(Long id, String password) {
         SysUser user = userMapper.selectById(id);
@@ -154,6 +170,26 @@ public class UserService {
             throw new BusinessException(ResultCode.DATA_NOT_FOUND);
         }
         user.setPassword(passwordEncoder.encode(password));
+        userMapper.updateById(user);
+    }
+
+    /**
+     * 修改当前用户密码
+     */
+    public void changePassword(String oldPassword, String newPassword) {
+        Long userId = SecurityUtils.getUserId();
+        if (userId == null) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "未登录");
+        }
+        SysUser user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(ResultCode.DATA_NOT_FOUND);
+        }
+        // 校验旧密码
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new BusinessException(ResultCode.FAIL, "原密码错误");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
         userMapper.updateById(user);
     }
 
@@ -180,6 +216,7 @@ public class UserService {
         vo.setEmail(user.getEmail());
         vo.setPhone(user.getPhone());
         vo.setSex(user.getSex());
+        vo.setAvatar(user.getAvatar());
         vo.setStatus(user.getStatus());
         // 获取角色列表
         vo.setRoleIds(userRoleMapper.selectRoleIdsByUserId(user.getId()).toArray(new Long[0]));

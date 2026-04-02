@@ -1,9 +1,9 @@
 # OA 平台 - 待办事项
 
-> 最后更新：2026-03-31
+> 最后更新：2026-04-02
 
 ## 当前优先级
-完善用户管理和系统管理功能
+通知管理、收文管理、日志管理模块开发
 
 ## 🔴 已修复问题
 1. **登录页面无法显示** - 前端验证码/登录页问题 ✅
@@ -34,11 +34,12 @@
 docker start oa-mysql-dev oa-redis-dev
 
 # 2. 启动后端
-cd /Users/basara/openclaw-projects/oa-platform/backend/oa-platform-admin
+cd backend/oa-platform-admin
+mvn clean package -DskipTests
 java -jar target/oa-platform-admin.jar
 
 # 3. 启动前端
-cd /Users/basara/openclaw-projects/oa-platform/frontend
+cd frontend
 npm run dev
 ```
 
@@ -58,21 +59,71 @@ npm run dev
 - [✅] 实现验证码功能
 - [✅] 修复登录后权限问题
 - [✅] 确认角色权限设计
-
-### 角色管理模块（当前任务）
-- [✅] 后端：角色管理 API（已有完整的 CRUD + 分配权限）
-- [✅] 前端：修复角色管理页面（修正 API 路径、添加菜单树加载）
+- [✅] 用户管理模块（CRUD + 详情 + 密码重置） 2026-04-02
+- [✅] 通知管理模块（CRUD + 已读未读） 2026-04-02
+- [✅] 收文管理模块 2026-04-02
+- [✅] 登录日志与操作日志模块 2026-04-02
 
 ### 中优先级
-- [ ] 用户管理模块（CRUD）
-- [ ] 部门管理模块（树形 CRUD）
-- [ ] 菜单管理模块
-- [ ] 发文流程设计（Flowable BPMN）
-- [ ] 收文流程设计（Flowable BPMN）
+- [✅] 部门管理模块（树形 CRUD）
+- [✅] 菜单管理模块
+- [✅] 发文流程设计（Flowable BPMN）
 
 ### 低优先级
-- [ ] 通知系统
-- [ ] 日志管理
-- [ ] 附件上传
-- [ ] 前端 UI 优化
+- [✅] 附件上传
+- [✅] 前端 UI 优化
 - [ ] Docker 部署配置
+
+## 2026-04-02 完成模块
+
+### 用户管理模块
+- [✅] 数据库 sys_user 表已有 phone、avatar 字段
+- [✅] 后端：GET /api/system/user/info（当前用户信息）
+- [✅] 后端：PUT /api/system/user/password（修改当前用户密码）
+- [✅] 前端：api/system/user.js 修正 resetPassword 接口路径
+- [✅] 前端：用户列表完善（头像列、昵称、完整表单弹窗）
+
+### 通知管理模块
+- [✅] 数据库：sys_notification 表（含 type、target_type、read_status）
+- [✅] 数据库：sys_notification_read 表（阅读记录）
+- [✅] 后端：NotificationController（/api/system/notification）
+- [✅] 后端：NotificationService（CRUD + 已读/未读）
+- [✅] 前端：api/system/notification.js
+- [✅] 前端：views/system/notification/index.vue
+- [✅] 路由注册 + 左侧菜单入口
+
+### 收文管理模块
+- [✅] 数据库：sys_incoming_document 表
+- [✅] 后端：IncomingDocumentController（/api/workflow/incoming）
+- [✅] 后端：IncomingDocumentService
+- [✅] 前端：api/workflow/incoming.js
+- [✅] 前端：views/workflow/IncomingList.vue、IncomingDetail.vue
+- [✅] 路由注册 + 左侧菜单入口
+
+### 日志管理模块
+- [✅] 数据库：sys_login_log 表
+- [✅] 数据库：sys_operation_log 表
+- [✅] 后端：LoginLogController（/api/system/login-log）
+- [✅] 后端：OperationLogController（/api/system/operation-log）
+- [✅] 前端：api/system/log.js
+- [✅] 前端：views/system/log/LoginLog.vue、OperationLog.vue
+- [✅] 路由注册 + 左侧菜单入口
+
+## 待完善事项
+
+### 通知管理
+- [ ] 通知推送（根据 target_type 推送给指定用户/部门/全员）
+- [ ] 通知摘要/未读数角标
+
+### 收文管理
+- [ ] Flowable 流程集成（分发/归档关联审批流程）
+- [ ] 附件上传功能
+
+### 日志管理
+- [ ] AOP 操作日志切面（@Log 注解）
+- [ ] 日志导出 Excel
+
+### 部署
+- [ ] Docker Compose 生产环境配置
+- [ ] Nginx 前端部署配置
+- [ ] 环境变量配置文档
