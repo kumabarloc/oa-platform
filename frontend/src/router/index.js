@@ -44,6 +44,36 @@ const routes = [
         component: () => import('@/views/system/menu/index.vue'),
         meta: { title: '菜单管理', permissions: ['system:menu:list'] },
       },
+      {
+        path: 'workflow/document/list',
+        name: 'DocumentList',
+        component: () => import('@/views/workflow/DocumentList.vue'),
+        meta: { title: '发文管理' },
+      },
+      {
+        path: 'workflow/document/create',
+        name: 'DocumentCreate',
+        component: () => import('@/views/workflow/DocumentForm.vue'),
+        meta: { title: '新建发文' },
+      },
+      {
+        path: 'workflow/document/edit/:id',
+        name: 'DocumentEdit',
+        component: () => import('@/views/workflow/DocumentForm.vue'),
+        meta: { title: '编辑发文' },
+      },
+      {
+        path: 'workflow/document/:id',
+        name: 'DocumentDetail',
+        component: () => import('@/views/workflow/DocumentDetail.vue'),
+        meta: { title: '公文详情' },
+      },
+      {
+        path: 'workflow/my-tasks',
+        name: 'MyTasks',
+        component: () => import('@/views/workflow/MyTasks.vue'),
+        meta: { title: '我的待办' },
+      },
     ],
   },
 ]
