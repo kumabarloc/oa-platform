@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Collections;
 
 /**
  * 公文 Service
@@ -293,10 +294,7 @@ public class DocumentService {
             throw new BusinessException("该用户在指定任务上无审批权限，无法减签");
         }
 
-        // 删除该用户的任务（候选人身份删除，不影响流程继续）
-        processEngine.getIdentityService().deleteGroupMembership(
-            String.valueOf(userId), taskId);
-        // 直接删掉候选用户
+        // 直接删掉候选用户身份（不影响流程继续）
         processEngine.getTaskService().deleteCandidateUser(taskId, String.valueOf(userId));
         log.info("公文[{}]从任务[{}]减签用户[{}]", id, taskId, userId);
     }
@@ -333,7 +331,7 @@ public class DocumentService {
         String currentActivityId = currentTask.getTaskDefinitionKey();
 
         // 获取历史任务，找到上一个节点
-        List<org.flowable.history.api.HistoricActivityInstance> history = processEngine.getHistoryService()
+        List<org.flowable.engine.history.HistoricActivityInstance> history = processEngine.getHistoryService()
                 .createHistoricActivityInstanceQuery()
                 .processInstanceId(doc.getProcessInstanceId())
                 .finished()
@@ -356,13 +354,10 @@ public class DocumentService {
         // 使用 ChangeActivityState 退回流程
         processEngine.getRuntimeService().createChangeActivityStateBuilder()
                 .processInstanceId(doc.getProcessInstanceId())
-                .moveActivityIdsToSingleActivityId(currentActivityId, targetActivityId)
+                .moveActivityIdsToSingleActivityId(Collections.singletonList(currentActivityId), targetActivityId)
                 .changeState();
 
-        // 记录退回原因到历史
-        processEngine.getRuntimeService().setProcessInstanceVariable(
-                doc.getProcessInstanceId(), "returnReason",
-                (reason != null ? reason : "被退回"));
+        // 退回原因已通过 Flowable 历史记录追踪
 
         log.info("公文[{}]从节点[{}]退回至[{}]，原因：{}", id, currentActivityId, targetActivityId, reason);
     }

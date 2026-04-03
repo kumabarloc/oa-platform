@@ -13,14 +13,24 @@
         <!-- 开始事件 -->
         <startEvent id="start" name="起草完成"/>
 
-        <!-- 部门负责人审批节点 -->
+        <!-- 部门负责人审批节点（支持会签：加签后多人共同审批，任一通过即流向下游） -->
         <userTask id="dept_approval" name="部门负责人审批" flowable:assignee="${initiator}">
             <documentation>部门负责人审核公文内容</documentation>
+            <!-- 会签配置：任一审批人通过即流向下游 -->
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <loopCardinality>1</loopCardinality>
+                <completionCondition>${nrOfCompletedInstances >= 1}</completionCondition>
+            </multiInstanceLoopCharacteristics>
         </userTask>
 
-        <!-- 综合办公室审批节点 -->
+        <!-- 综合办公室审批节点（支持会签：加签后多人共同审批，任一通过即流向下游） -->
         <userTask id="office_approval" name="综合办公室审批" flowable:assignee="${initiator}">
             <documentation>综合办公室复核并发布</documentation>
+            <!-- 会签配置：任一审批人通过即流向下游 -->
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <loopCardinality>1</loopCardinality>
+                <completionCondition>${nrOfCompletedInstances >= 1}</completionCondition>
+            </multiInstanceLoopCharacteristics>
         </userTask>
 
         <!-- 结束事件 - 发布 -->

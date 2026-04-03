@@ -23,6 +23,13 @@
             <version>${oa.platform.version}</version>
         </dependency>
 
+        <!-- 依赖 System 模块（收文实体） -->
+        <dependency>
+            <groupId>com.oa</groupId>
+            <artifactId>oa-platform-system</artifactId>
+            <version>${oa.platform.version}</version>
+        </dependency>
+
         <!-- Flowable -->
         <dependency>
             <groupId>org.flowable</groupId>
