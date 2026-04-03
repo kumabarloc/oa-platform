@@ -66,6 +66,7 @@ const allMenus = [
   { id: 3, menuName: '公文管理', icon: 'Document', children: [
     { id: 31, menuName: '发文管理', path: '/workflow/document/list', perms: 'oa:document:list' },
     { id: 32, menuName: '收文管理', path: '/workflow/incoming' },
+    { id: 34, menuName: '用车申请', path: '/workflow/vehicle/list' },
     { id: 33, menuName: '我的待办', path: '/workflow/my-tasks' },
   ]},
 ]
