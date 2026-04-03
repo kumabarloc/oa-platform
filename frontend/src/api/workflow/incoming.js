@@ -27,3 +27,7 @@ export function distributeIncoming(id) {
 export function archiveIncoming(id) {
   return request({ url: `/workflow/incoming/${id}/archive`, method: 'put' })
 }
+
+export function getIncomingHistory(id) {
+  return request({ url: `/workflow/incoming/${id}/history`, method: 'get' })
+}

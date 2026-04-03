@@ -43,3 +43,9 @@ export function getMyTasks(userId) {
 export function getApprovalHistory(id) {
   return request({ url: `/workflow/document/${id}/history`, method: 'get' })
 }
+
+export const addSignDocument = (id, userId) =>
+  request.post(`/workflow/document/${id}/add-sign`, { userId })
+
+export const returnDocument = (id, data) =>
+  request.put(`/workflow/document/${id}/return`, data)

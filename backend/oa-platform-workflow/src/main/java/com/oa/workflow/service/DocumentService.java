@@ -227,6 +227,148 @@ public class DocumentService {
         return result;
     }
 
+    // ==================== 加签 / 减签 / 退回 ====================
+
+    /**
+     * 加签：为当前任务节点追加审批人（会签）
+     * @param id      公文ID
+     * @param userId  待加签用户ID
+     * @param userName 待加签用户姓名
+     */
+    @Transactional
+    public void addSign(Long id, Long userId, String userName) {
+        SysDocument doc = getById(id);
+        if (doc.getProcessInstanceId() == null) {
+            throw new BusinessException("该公文未启动流程，无法加签");
+        }
+        if (!"pending".equals(doc.getStatus())) {
+            throw new BusinessException("只有待审批状态的公文可以加签");
+        }
+
+        // 查找当前活跃任务
+        List<Task> tasks = processEngine.getTaskService().createTaskQuery()
+                .processInstanceId(doc.getProcessInstanceId())
+                .active()
+                .list();
+
+        if (tasks.isEmpty()) {
+            throw new BusinessException("当前没有可加签的任务节点");
+        }
+
+        for (Task task : tasks) {
+            // 为任务追加候选用户
+            processEngine.getTaskService().addCandidateUser(task.getId(), String.valueOf(userId));
+            log.info("公文[{}]加签用户[{}]到任务[{}]", id, userName, task.getId());
+        }
+    }
+
+    /**
+     * 减签：移除指定审批人的任务
+     * @param id      公文ID
+     * @param taskId  任务ID
+     * @param userId  待减签用户ID
+     */
+    @Transactional
+    public void removeSign(Long id, String taskId, Long userId) {
+        SysDocument doc = getById(id);
+        if (!"pending".equals(doc.getStatus())) {
+            throw new BusinessException("只有待审批状态的公文可以减签");
+        }
+
+        // 查找该用户在此任务上的候选人身份
+        List<Task> tasks = processEngine.getTaskService().createTaskQuery()
+                .taskId(taskId)
+                .taskCandidateUser(String.valueOf(userId))
+                .list();
+
+        if (tasks.isEmpty()) {
+            // 尝试按 assignee 查找
+            tasks = processEngine.getTaskService().createTaskQuery()
+                    .taskId(taskId)
+                    .taskAssignee(String.valueOf(userId))
+                    .list();
+        }
+
+        if (tasks.isEmpty()) {
+            throw new BusinessException("该用户在指定任务上无审批权限，无法减签");
+        }
+
+        // 删除该用户的任务（候选人身份删除，不影响流程继续）
+        processEngine.getIdentityService().deleteGroupMembership(
+            String.valueOf(userId), taskId);
+        // 直接删掉候选用户
+        processEngine.getTaskService().deleteCandidateUser(taskId, String.valueOf(userId));
+        log.info("公文[{}]从任务[{}]减签用户[{}]", id, taskId, userId);
+    }
+
+    /**
+     * 退回：将流程退回上一节点
+     * @param id           公文ID
+     * @param userId       操作人ID
+     * @param userName     操作人姓名
+     * @param targetTaskId 目标退回节点（可选，为空则退回上一节点）
+     * @param reason       退回原因
+     */
+    @Transactional
+    public void returnStep(Long id, Long userId, String userName, String targetTaskId, String reason) {
+        SysDocument doc = getById(id);
+        if (doc.getProcessInstanceId() == null) {
+            throw new BusinessException("该公文未启动流程，无法退回");
+        }
+        if (!"pending".equals(doc.getStatus())) {
+            throw new BusinessException("只有待审批状态的公文可以退回");
+        }
+
+        // 查找当前活跃任务
+        List<Task> currentTasks = processEngine.getTaskService().createTaskQuery()
+                .processInstanceId(doc.getProcessInstanceId())
+                .active()
+                .list();
+
+        if (currentTasks.isEmpty()) {
+            throw new BusinessException("当前没有可退回的任务节点");
+        }
+
+        Task currentTask = currentTasks.get(0);
+        String currentActivityId = currentTask.getTaskDefinitionKey();
+
+        // 获取历史任务，找到上一个节点
+        List<org.flowable.history.api.HistoricActivityInstance> history = processEngine.getHistoryService()
+                .createHistoricActivityInstanceQuery()
+                .processInstanceId(doc.getProcessInstanceId())
+                .finished()
+                .orderByHistoricActivityInstanceEndTime()
+                .desc()
+                .list();
+
+        if (history.isEmpty()) {
+            throw new BusinessException("无法找到可退回的上一个节点");
+        }
+
+        String targetActivityId;
+        if (targetTaskId != null && !targetTaskId.isEmpty()) {
+            targetActivityId = targetTaskId;
+        } else {
+            // 取上一个已完成的节点
+            targetActivityId = history.get(0).getActivityId();
+        }
+
+        // 使用 ChangeActivityState 退回流程
+        processEngine.getRuntimeService().createChangeActivityStateBuilder()
+                .processInstanceId(doc.getProcessInstanceId())
+                .moveActivityIdsToSingleActivityId(currentActivityId, targetActivityId)
+                .changeState();
+
+        // 记录退回原因到历史
+        processEngine.getRuntimeService().setProcessInstanceVariable(
+                doc.getProcessInstanceId(), "returnReason",
+                (reason != null ? reason : "被退回"));
+
+        log.info("公文[{}]从节点[{}]退回至[{}]，原因：{}", id, currentActivityId, targetActivityId, reason);
+    }
+
+    // ==================== 历史记录 ====================
+
     /**
      * 查询流程历史（审批记录）
      */

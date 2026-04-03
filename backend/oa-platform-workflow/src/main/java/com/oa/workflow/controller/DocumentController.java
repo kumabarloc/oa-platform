@@ -83,6 +83,30 @@ public class DocumentController {
         return R.ok("已驳回");
     }
 
+    @Operation(summary = "加签：为当前节点追加审批人（会签）")
+    @PostMapping("/{id}/add-sign")
+    public R<?> addSign(@PathVariable Long id, @RequestBody AddSignRequest request) {
+        documentService.addSign(id, request.getUserId(), request.getUserName());
+        return R.ok("加签成功");
+    }
+
+    @Operation(summary = "减签：移除指定审批人")
+    @DeleteMapping("/{id}/remove-sign/{taskId}/{userId}")
+    public R<?> removeSign(@PathVariable Long id,
+                           @PathVariable String taskId,
+                           @PathVariable Long userId) {
+        documentService.removeSign(id, taskId, userId);
+        return R.ok("减签成功");
+    }
+
+    @Operation(summary = "退回：退回上一审批节点")
+    @PutMapping("/{id}/return")
+    public R<?> returnStep(@PathVariable Long id, @RequestBody ReturnRequest request) {
+        documentService.returnStep(id, request.getUserId(), request.getUserName(),
+                                   request.getTargetTaskId(), request.getReason());
+        return R.ok("退回成功");
+    }
+
     @Operation(summary = "我的待办任务")
     @GetMapping("/my-tasks")
     public R<?> getMyTasks(@RequestParam Long userId) {
@@ -110,6 +134,20 @@ public class DocumentController {
     @Data
     public static class RejectRequest {
         private Long approverId;
+        private String reason;
+    }
+
+    @Data
+    public static class AddSignRequest {
+        private Long userId;
+        private String userName;
+    }
+
+    @Data
+    public static class ReturnRequest {
+        private Long userId;
+        private String userName;
+        private String targetTaskId;
         private String reason;
     }
 }
